@@ -5,8 +5,8 @@ services:
     image: mysql
     restart: always
     volumes:
-      - .db_storage:/var/lib/mysql
-      - .scripts:/docker-entrypoint-initdb.d
+      - ./storage:/var/lib/mysql
+      - ./scripts:/docker-entrypoint-initdb.d
     ports:
       - "49153:3306"
     environment:
