@@ -22,9 +22,7 @@ public class ClientRepository implements AutoCloseable {
     }
 
     public List<Client> getClients() {
-        List<Client> clients =
-                entityManager.createQuery("from Client", Client.class).getResultList();
-        return clients;
+        return entityManager.createQuery("from Client", Client.class).getResultList();
     }
 
     public void removeClient(Client client) {
@@ -54,7 +52,6 @@ public class ClientRepository implements AutoCloseable {
 
     @Override
     public void close() {
-        System.out.println("Closing tango");
         entityManagerFactory.close();
         entityManager.close();
     }

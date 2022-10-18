@@ -1,5 +1,6 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -46,12 +47,17 @@ public class Client {
     private ClientType clientType;
 
     public void addRent(Rent rent) {
+        if (rents == null) {
+            rents = new ArrayList<>();
+        }
         rents.add(rent);
         rent.setClient(this);
     }
 
     public void removeRent(Rent rent) {
-        rents.remove(rent);
-        rent.setClient(null);
+        if (rents != null) {
+            rents.remove(rent);
+            rent.setClient(null);
+        }
     }
 }
