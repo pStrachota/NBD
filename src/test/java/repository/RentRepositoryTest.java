@@ -1,5 +1,6 @@
 package repository;
 
+import static dataForTests.testData.book;
 import static dataForTests.testData.client;
 import static dataForTests.testData.client2;
 import static dataForTests.testData.client3;
@@ -7,6 +8,7 @@ import static dataForTests.testData.rent;
 import static dataForTests.testData.rent2;
 import static dataForTests.testData.rent3;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -16,7 +18,10 @@ import java.util.concurrent.TimeUnit;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.RollbackException;
+import model.Book;
 import model.Rent;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
 class RentRepositoryTest {
@@ -24,68 +29,37 @@ class RentRepositoryTest {
     private static EntityManagerFactory entityManagerFactory =
             Persistence.createEntityManagerFactory("default");
 
+    @AfterAll
+    static void close() {
+        entityManagerFactory.close();
+    }
+
     @Test
-    void optimisticLockTest() {
-        ExecutorService es = Executors.newFixedThreadPool(2);
+    void optimisticLockExceptionTest() {
 
-        try {
-            persistRent();
-            es.execute(() -> {
-                try {
-                    updateRent1();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-            es.execute(() -> {
-                try {
-                    updateRent2();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-            es.shutdown();
-            try {
-                es.awaitTermination(5, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityManager entityManager1 = entityManagerFactory.createEntityManager();
 
-        } finally {
-            entityManagerFactory.close();
-        }
+        entityManager.getTransaction().begin();
+        entityManager1.getTransaction().begin();
 
-    }
+        entityManager.persist(rent);
+        entityManager.getTransaction().commit();
 
-    private static void persistRent() {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-        em.persist(rent);
-        em.getTransaction().commit();
-        em.close();
-    }
+        Rent rentEm = entityManager.find(Rent.class, rent.getRentId());
+        Rent rentEm1 = entityManager1.find(Rent.class, rent.getRentId());
 
-    private static void updateRent1() {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-        Rent rent1 = em.find(Rent.class, 1L);
-        rent1.setRentCost(1000);
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        em.getTransaction().commit();
-        em.close();
-    }
+        entityManager.getTransaction().begin();
+        rentEm.setRentCost(100);
+        entityManager.getTransaction().commit();
 
-    private static void updateRent2() {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-        Rent rent2 = em.find(Rent.class, 1L);
-        rent2.setRentCost(2000);
-        em.getTransaction().commit();
-        em.close();
+        rentEm1.setRentCost(200);
+
+        assertThatThrownBy(() -> entityManager1.getTransaction().commit()).isInstanceOf(
+                RollbackException.class);
+
+        entityManager.close();
+        entityManager1.close();
     }
 
     @Test
