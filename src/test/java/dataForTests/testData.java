@@ -51,23 +51,26 @@ public class testData {
             .clientType(ClientType.UNIVERSITY_EMPLOYEE)
             .build();
 
-    public static RentableItem book = new Book(
-            "1234567890",
-            "J.K. Rowling",
-            "Harry Potter",
-            "PWN");
+    public static RentableItem book = Book.builder()
+            .title("Pan Tadeusz")
+            .author("Adam Mickiewicz")
+            .publishingHouse("PWN")
+            .serialNumber("123456789")
+            .build();
 
-    public static RentableItem book2 = new Book(
-            "1234567891",
-            "J.K. Rowling",
-            "Harry Potter II",
-            "PWN");
+    public static RentableItem book2 = Book.builder()
+            .title("Harry Potter")
+            .author("J.K. Rowling")
+            .publishingHouse("PWN")
+            .serialNumber("987654321")
+            .build();
 
-    public static RentableItem book3 = new Book(
-            "1234567892",
-            "J.K. Rowling",
-            "Harry Potter III",
-            "PWN");
+    public static RentableItem book3 = Book.builder()
+            .title("W pustyni i w puszczy")
+            .author("Henryk Sienkiewicz")
+            .publishingHouse("PWN")
+            .serialNumber("123456788")
+            .build();
 
     public static Rent rent = Rent.builder()
             .beginTime(LocalDateTime.now())

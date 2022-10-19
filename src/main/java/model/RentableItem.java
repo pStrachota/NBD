@@ -12,10 +12,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -34,9 +36,4 @@ public class RentableItem {
 
     private String title;
 
-    public RentableItem(String serialNumber, String author, String title) {
-        this.serialNumber = serialNumber;
-        this.author = author;
-        this.title = title;
-    }
 }
