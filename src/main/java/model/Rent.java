@@ -17,8 +17,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Getter
@@ -47,6 +50,8 @@ public class Rent {
     private Client client;
 
     @OneToMany
+    @Fetch(FetchMode.SUBSELECT)
+    @BatchSize(size = 10)
     @JoinColumn
     @Cascade(CascadeType.ALL)
     private List<RentableItem> rentableItem;

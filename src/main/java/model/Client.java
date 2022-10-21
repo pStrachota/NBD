@@ -18,6 +18,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Getter
@@ -40,7 +43,10 @@ public class Client {
     private String surname;
 
     @OneToMany(mappedBy = "client")
+    @Fetch(FetchMode.SUBSELECT)
+    @BatchSize(size = 10)
     private List<Rent> rents;
+
     @Embedded
     private Address address;
     @Enumerated(EnumType.STRING)
