@@ -1,7 +1,7 @@
 package manager;
 
 import java.util.List;
-import model.Client;
+import model.user.Client;
 import repository.ClientRepository;
 
 public class ClientsManager {

@@ -6,7 +6,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import model.Client;
+import model.user.Client;
 import model.Rent;
 
 public class RentRepository implements AutoCloseable {

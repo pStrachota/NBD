@@ -1,4 +1,4 @@
-package model;
+package model.resource;
 
 import javax.persistence.Entity;
 import lombok.NoArgsConstructor;
@@ -7,8 +7,8 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @SuperBuilder
 @NoArgsConstructor
-public class Article extends RentableItem {
+public class Book extends RentableItem {
 
-    private String parentOrganisation;
+    private String publishingHouse;
 
 }

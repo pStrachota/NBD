@@ -1,6 +1,6 @@
 package manager;
 
-import model.RentableItem;
+import model.resource.RentableItem;
 import repository.RentableItemRepository;
 
 public class RentableItemManager {

@@ -1,4 +1,4 @@
-package model;
+package model.user;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
+import model.Rent;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -42,28 +42,9 @@ public class Client {
 
     private String surname;
 
-    @OneToMany(mappedBy = "client")
-    @Fetch(FetchMode.SUBSELECT)
-    @BatchSize(size = 10)
-    private List<Rent> rents;
-
     @Embedded
     private Address address;
     @Enumerated(EnumType.STRING)
     private ClientType clientType;
 
-    public void addRent(Rent rent) {
-        if (rents == null) {
-            rents = new ArrayList<>();
-        }
-        rents.add(rent);
-        rent.setClient(this);
-    }
-
-    public void removeRent(Rent rent) {
-        if (rents != null) {
-            rents.remove(rent);
-            rent.setClient(null);
-        }
-    }
 }

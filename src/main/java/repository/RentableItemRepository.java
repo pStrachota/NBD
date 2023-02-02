@@ -4,7 +4,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import model.RentableItem;
+import model.resource.RentableItem;
 
 public class RentableItemRepository implements AutoCloseable {
 

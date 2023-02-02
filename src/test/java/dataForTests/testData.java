@@ -2,12 +2,12 @@ package dataForTests;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import model.Address;
-import model.Book;
-import model.Client;
-import model.ClientType;
+import model.user.Address;
+import model.resource.Book;
+import model.user.Client;
+import model.user.ClientType;
 import model.Rent;
-import model.RentableItem;
+import model.resource.RentableItem;
 
 public class testData {
 
