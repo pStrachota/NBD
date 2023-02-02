@@ -30,9 +30,9 @@ import org.hibernate.annotations.FetchMode;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-@EqualsAndHashCode(of = "rentId")
+@EqualsAndHashCode(of = "rentId", callSuper = false)
 @AllArgsConstructor
-public class Rent {
+public class Rent extends AbstractEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,9 +41,6 @@ public class Rent {
     private LocalDateTime beginTime;
 
     private LocalDateTime endTime;
-
-    @Version
-    private Integer version;
 
     private double rentCost;
 

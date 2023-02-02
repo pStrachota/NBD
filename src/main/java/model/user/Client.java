@@ -1,7 +1,5 @@
 package model.user;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -9,18 +7,13 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import model.Rent;
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import model.AbstractEntity;
 
 @Entity
 @Getter
@@ -28,17 +21,14 @@ import org.hibernate.annotations.FetchMode;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = "personalId")
-public class Client {
+@EqualsAndHashCode(of = "personalId", callSuper = false)
+public class Client extends AbstractEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long personalId;
 
     private String name;
-
-    @Version
-    private Integer version;
 
     private String surname;
 
