@@ -1,15 +1,13 @@
 package repository;
 
-import exception.MaxItemLimitExceededException;
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import model.user.Client;
 import model.Rent;
 
-public class RentRepository implements AutoCloseable {
+public class RentRepository extends Repository<Rent> implements AutoCloseable {
 
     EntityManagerFactory entityManagerFactory;
     EntityManager entityManager;
@@ -19,64 +17,50 @@ public class RentRepository implements AutoCloseable {
         entityManager = entityManagerFactory.createEntityManager();
     }
 
-    public void addArchiveRent(Rent rent) {
-        entityManager.getTransaction().begin();
-        entityManager.persist(rent);
-        entityManager.getTransaction().commit();
-    }
-
-    public void addCurrentRent(Rent rent) {
-
-        Client client = rent.getClient();
-
-        //if client has size
-        if (client.getClientType().getMaxItems() > client.getRents().size()) {
+    public Rent add(Rent rent) {
+        try {
             entityManager.getTransaction().begin();
             entityManager.persist(rent);
             entityManager.getTransaction().commit();
-        } else {
-            throw new MaxItemLimitExceededException("Client has reached the maximum number of items");
+            return rent;
+        } catch (Exception e) {
+            return null;
         }
     }
 
-    public List<Rent> getRents() {
+    public List<Rent> getItems() {
         return entityManager.createQuery("from Rent", Rent.class).getResultList();
     }
 
-    public void removeRent(Rent rent) {
+    public boolean remove(Rent rent) {
+        try {
 
-        Client client = rent.getClient();
-        rent.setEndTime(LocalDateTime.now());
-
-        if (rent.getEndTime().isAfter(rent.getBeginTime().plusDays(client.getClientType().getMaxDays()))) {
-
-            int daysAfterEndTime = rent.getEndTime().getDayOfYear() - rent.getBeginTime().plusDays(client.getClientType().getMaxDays()).getDayOfYear();
-            rent.setRentCost(client.getClientType().getPenalty() * daysAfterEndTime);
+            entityManager.getTransaction().begin();
+            entityManager.remove(rent);
+            entityManager.getTransaction().commit();
+            return true;
+        } catch (Exception e) {
+            return false;
         }
-
-        entityManager.getTransaction().begin();
-        entityManager.remove(rent);
-        entityManager.getTransaction().commit();
     }
 
-    public Rent findByID(Long id) {
+    public Optional<Rent> findByID(Long id) {
         entityManager.getTransaction().begin();
         Rent rent = entityManager.find(Rent.class, id);
         entityManager.getTransaction().commit();
-        return rent;
+        return Optional.ofNullable(rent);
     }
 
-    public String getReport() {
-
-        entityManager.getTransaction().begin();
-        List<Rent> rents = entityManager.createQuery("SELECT r FROM Rent r").getResultList();
-        entityManager.getTransaction().commit();
-
-        StringBuilder stringBuilder = new StringBuilder();
-        for (Rent rent : rents) {
-            stringBuilder.append(rent.toString());
+    @Override
+    public Rent update(Rent rent) {
+        try {
+            entityManager.getTransaction().begin();
+            entityManager.merge(rent);
+            entityManager.getTransaction().commit();
+            return rent;
+        } catch (Exception e) {
+            return null;
         }
-        return stringBuilder.toString();
     }
 
     @Override

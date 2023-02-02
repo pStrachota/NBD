@@ -1,12 +1,13 @@
 package repository;
 
 import java.util.List;
+import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import model.resource.RentableItem;
 
-public class RentableItemRepository implements AutoCloseable {
+public class RentableItemRepository extends Repository<RentableItem> implements AutoCloseable {
 
     EntityManagerFactory entityManagerFactory;
     EntityManager entityManager;
@@ -16,41 +17,52 @@ public class RentableItemRepository implements AutoCloseable {
         entityManager = entityManagerFactory.createEntityManager();
     }
 
-    public void addRentableItem(RentableItem rentableItem) {
-        entityManager.getTransaction().begin();
-        entityManager.persist(rentableItem);
-        entityManager.getTransaction().commit();
+    public RentableItem add(RentableItem rentableItem) {
+        try {
+
+            entityManager.getTransaction().begin();
+            entityManager.persist(rentableItem);
+            entityManager.getTransaction().commit();
+            return rentableItem;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
-    public List<RentableItem> getAllRentableItems() {
+    public List<RentableItem> getItems() {
         return entityManager.createQuery("from RentableItem", RentableItem.class).getResultList();
     }
 
-    public void removeRentableItem(RentableItem rentableItem) {
-        entityManager.getTransaction().begin();
-        entityManager.remove(rentableItem);
-        entityManager.getTransaction().commit();
+    public boolean remove(RentableItem rentableItem) {
+
+        try {
+            entityManager.getTransaction().begin();
+            entityManager.remove(rentableItem);
+            entityManager.getTransaction().commit();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
-    public RentableItem findByID(Long id) {
+    public Optional<RentableItem> findByID(Long id) {
         entityManager.getTransaction().begin();
         RentableItem rentableItem = entityManager.find(RentableItem.class, id);
         entityManager.getTransaction().commit();
-        return rentableItem;
+        return Optional.ofNullable(rentableItem);
     }
 
-    public String getReport() {
+    @Override
+    public RentableItem update(RentableItem rentableItem) {
 
-        entityManager.getTransaction().begin();
-        List<RentableItem> rentableItems =
-                entityManager.createQuery("SELECT r FROM RentableItem r").getResultList();
-        entityManager.getTransaction().commit();
-
-        StringBuilder stringBuilder = new StringBuilder();
-        for (RentableItem rentableItem : rentableItems) {
-            stringBuilder.append(rentableItem.toString());
+        try {
+            entityManager.getTransaction().begin();
+            entityManager.merge(rentableItem);
+            entityManager.getTransaction().commit();
+            return rentableItem;
+        } catch (Exception e) {
+            return null;
         }
-        return stringBuilder.toString();
     }
 
     @Override
