@@ -55,7 +55,7 @@ class RentableItemRepositoryTest {
     @Test
     void addRentableItemTest() {
         try (RentableItemRepository rentableItemRepository = new RentableItemRepository()) {
-            rentableItemRepository.addRentableItem(book2);
+            rentableItemRepository.add(book2);
             assertThat(rentableItemRepository.findByID(1L)).isEqualTo(book2);
         }
     }
@@ -63,10 +63,10 @@ class RentableItemRepositoryTest {
     @Test
     void removeRentableItemTest() {
         try (RentableItemRepository rentableItemRepository = new RentableItemRepository()) {
-            rentableItemRepository.addRentableItem(book3);
-            assertThat(rentableItemRepository.getAllRentableItems()).contains(book3);
-            rentableItemRepository.removeRentableItem(book3);
-            assertThat(rentableItemRepository.getAllRentableItems()).doesNotContain(book3);
+            rentableItemRepository.add(book3);
+            assertThat(rentableItemRepository.getItems()).contains(book3);
+            rentableItemRepository.remove(book3);
+            assertThat(rentableItemRepository.getItems()).doesNotContain(book3);
         }
     }
 

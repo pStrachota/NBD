@@ -28,8 +28,8 @@ class ClientRepositoryTest {
     void addClientTest() {
 
         try (ClientRepository clientRepository = new ClientRepository()) {
-            System.out.println(clientRepository.getClients().size());
-            clientRepository.addClient(client);
+            System.out.println(clientRepository.getItems().size());
+            clientRepository.add(client);
             assertThat(clientRepository.findByID(client.getPersonalId())).isEqualTo(client);
         }
     }
@@ -55,7 +55,8 @@ class ClientRepositoryTest {
 
         clientEm1.setName("newName1");
 
-        assertThatThrownBy(() -> entityManager1.getTransaction().commit()).isInstanceOf(RollbackException.class);
+        assertThatThrownBy(() -> entityManager1.getTransaction().commit())
+                .isInstanceOf(RollbackException.class);
 
         entityManager.close();
         entityManager1.close();
@@ -64,10 +65,10 @@ class ClientRepositoryTest {
     @Test
     void removeClientTest() {
         try (ClientRepository clientRepository = new ClientRepository()) {
-            clientRepository.addClient(client3);
-            assertThat(clientRepository.getClients()).contains(client3);
-            clientRepository.removeClient(client3);
-            assertThat(clientRepository.getClients()).doesNotContain(client3);
+            clientRepository.add(client3);
+            assertThat(clientRepository.getItems()).contains(client3);
+            clientRepository.remove(client3);
+            assertThat(clientRepository.getItems()).doesNotContain(client3);
 
         }
     }

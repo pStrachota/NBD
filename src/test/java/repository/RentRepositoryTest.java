@@ -1,7 +1,5 @@
 package repository;
 
-import static dataForTests.testData.client;
-import static dataForTests.testData.client3;
 import static dataForTests.testData.rent;
 import static dataForTests.testData.rent2;
 import static dataForTests.testData.rent3;
@@ -57,19 +55,17 @@ class RentRepositoryTest {
     @Test
     void removeRent() {
         try (RentRepository rentRepository = new RentRepository()) {
-            client3.addRent(rent3);
-            rentRepository.addCurrentRent(rent3);
-            assertThat(rentRepository.getRents()).contains(rent3);
-            rentRepository.removeRent(rent3);
-            assertThat(rentRepository.getRents()).doesNotContain(rent3);
+            rentRepository.add(rent3);
+            assertThat(rentRepository.getItems()).contains(rent3);
+            rentRepository.remove(rent3);
+            assertThat(rentRepository.getItems()).doesNotContain(rent3);
         }
     }
 
     @Test
     void addRent() {
         try (RentRepository rentRepository = new RentRepository()) {
-            client.addRent(rent2);
-            rentRepository.addCurrentRent(rent2);
+            rentRepository.add(rent2);
             assertThat(rentRepository.findByID(1L)).isEqualTo(rent2);
         }
     }
