@@ -1,5 +1,6 @@
 package manager;
 
+import exception.ItemNotFoundException;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import model.user.Client;
@@ -24,7 +25,7 @@ public class ClientManager {
 
     public Client findClientByID(Long id) {
         return clientRepository.findByID(id)
-                .orElseThrow(() -> new IllegalArgumentException("Client not found"));
+                .orElseThrow(() -> new ItemNotFoundException("Client not found"));
     }
     public List<Client> findAll() {
         return clientRepository.getItems();

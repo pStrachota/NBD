@@ -1,5 +1,6 @@
 package manager;
 
+import exception.ItemNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ public class RentableItemManager {
     }
 
     public RentableItem findRentableItemById(Long id) {
-        return rentableItemRepository.findByID(id).orElseThrow(() -> new IllegalArgumentException("RentableItem not found"));
+        return rentableItemRepository.findByID(id).orElseThrow(() -> new ItemNotFoundException("RentableItem not found"));
     }
 
     public RentableItem updateRentableItem(RentableItem rentableItem) {

@@ -1,9 +1,12 @@
 package manager;
 
+import exception.EndedRentException;
+import exception.ItemNotFoundException;
+import exception.MaxItemLimitExceededException;
+import exception.RentableItemNotAvailableException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import model.Rent;
 import model.resource.RentableItem;
@@ -21,15 +24,16 @@ public class RentManager {
 
     public Rent addRent(long clientId, List<Long> rentableItemIds) {
 
-        Client client = clientRepository.findByID(clientId).orElseThrow(() -> new IllegalArgumentException("Client not found"));
+        Client client = clientRepository.findByID(clientId)
+                .orElseThrow(() -> new ItemNotFoundException("Client not found"));
 
         List<RentableItem> rentableItems = new ArrayList<>();
 
         rentableItemIds.forEach(rentableItemId -> {
             RentableItem rentableItem = rentableItemRepository.findByID(rentableItemId)
-                    .orElseThrow(() -> new IllegalArgumentException("RentableItem not found"));
+                    .orElseThrow(() -> new ItemNotFoundException("RentableItem not found"));
             if (!rentableItem.isAvailable()) {
-                throw new IllegalArgumentException("RentableItem is rented");
+                throw new RentableItemNotAvailableException("RentableItem is rented");
             }
             rentableItem.setAvailable(false);
             rentableItems.add(rentableItem);
@@ -47,7 +51,7 @@ public class RentManager {
         if (client.getClientType().getMaxItems() > clientRents) {
             return rentRepository.add(rent);
         } else {
-            throw new IllegalArgumentException("Client has reached max items");
+            throw new MaxItemLimitExceededException("Client has reached max items");
         }
     }
 
@@ -57,10 +61,10 @@ public class RentManager {
 
     public Rent endRent(long id) {
         Rent rent = rentRepository.findByID(id)
-                .orElseThrow(() -> new IllegalArgumentException("Rent not found"));
+                .orElseThrow(() -> new ItemNotFoundException("Rent not found"));
 
         if (rent.isEnded()) {
-            throw new IllegalArgumentException("Rent is already ended");
+            throw new EndedRentException("Rent is already ended");
         }
 
         Client client = rent.getClient();
@@ -85,7 +89,8 @@ public class RentManager {
     }
 
     public Rent findRentById(Long id) {
-        return rentRepository.findByID(id).orElseThrow(() -> new IllegalArgumentException("Rent not found"));
+        return rentRepository.findByID(id)
+                .orElseThrow(() -> new ItemNotFoundException("Rent not found"));
     }
 
     public List<Rent> findAll() {
