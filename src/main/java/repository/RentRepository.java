@@ -6,6 +6,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import model.Rent;
+import model.user.Client;
 
 public class RentRepository extends Repository<Rent> implements AutoCloseable {
 
@@ -26,6 +27,14 @@ public class RentRepository extends Repository<Rent> implements AutoCloseable {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public int getNumberOfClientRentedItems(Client client) {
+        return entityManager
+                .createQuery("from Rent where client = :client and isEnded = false", Rent.class)
+                .setParameter("client", client)
+                .getResultList()
+                .size();
     }
 
     public List<Rent> getItems() {

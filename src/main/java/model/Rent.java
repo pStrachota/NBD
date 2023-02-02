@@ -61,6 +61,6 @@ public class Rent extends AbstractEntity {
     @BatchSize(size = 10)
     @JoinColumn
     @Cascade(CascadeType.ALL)
-    private List<RentableItem> rentableItem;
+    private List<RentableItem> rentableItems;
 
 }
