@@ -2,65 +2,67 @@ package model;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Version;
-import javax.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import java.util.UUID;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 import model.resource.RentableItem;
 import model.user.Client;
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import org.bson.codecs.pojo.annotations.BsonCreator;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 
-@Entity
-@Getter
-@Setter
-@SuperBuilder
+@Data
 @NoArgsConstructor
-@EqualsAndHashCode(of = "rentId", callSuper = false)
-@AllArgsConstructor
 public class Rent extends AbstractEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long rentId;
-
-    @NotNull
+    @BsonProperty("begin_time")
     private LocalDateTime beginTime;
 
-    @NotNull
+    @BsonProperty("end_time")
     private LocalDateTime endTime;
 
+
+    @BsonProperty("rent_cost")
     private double rentCost;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @Cascade(CascadeType.ALL)
+    @BsonProperty("client")
     private Client client;
 
-    @NotNull
-    @Column(columnDefinition = "boolean default true")
+    @BsonProperty("is_ended")
     private boolean isEnded;
 
-    @OneToMany
-    @Fetch(FetchMode.SUBSELECT)
-    @BatchSize(size = 10)
-    @JoinColumn
-    @Cascade(CascadeType.ALL)
+    @BsonProperty("rentable_items")
     private List<RentableItem> rentableItems;
+
+    @BsonCreator
+    public Rent(@BsonProperty("id") UUID id,
+                @BsonProperty("beginTime") LocalDateTime beginTime,
+                @BsonProperty("endTime") LocalDateTime endTime,
+                @BsonProperty("rentCost") double rentCost,
+                @BsonProperty("client") Client client,
+                @BsonProperty("isEnded") boolean isEnded,
+                @BsonProperty("rentableItems") List<RentableItem> rentableItems) {
+        super(id);
+        this.beginTime = beginTime;
+        this.endTime = endTime;
+        this.rentCost = rentCost;
+        this.client = client;
+        this.isEnded = isEnded;
+        this.rentableItems = rentableItems;
+    }
+
+    public Rent(@BsonProperty("beginTime") LocalDateTime beginTime,
+                @BsonProperty("endTime") LocalDateTime endTime,
+                @BsonProperty("rentCost") double rentCost,
+                @BsonProperty("client") Client client,
+                @BsonProperty("isEnded") boolean isEnded,
+                @BsonProperty("rentableItems") List<RentableItem> rentableItems) {
+        super(UUID.randomUUID());
+        this.beginTime = beginTime;
+        this.endTime = endTime;
+        this.rentCost = rentCost;
+        this.client = client;
+        this.isEnded = isEnded;
+        this.rentableItems = rentableItems;
+    }
 
 }

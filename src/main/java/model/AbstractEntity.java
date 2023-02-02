@@ -1,20 +1,18 @@
 package model;
 
-import java.io.Serializable;
 import java.util.UUID;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Version;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 
-@MappedSuperclass
 @Data
-public class AbstractEntity implements Serializable {
+@NoArgsConstructor
+public class AbstractEntity {
 
-    @NotNull
+    @BsonProperty("id")
     private UUID uuid;
 
-    @Version
-    private long version;
-
+    public AbstractEntity(UUID uuid) {
+        this.uuid = uuid;
+    }
 }

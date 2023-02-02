@@ -1,46 +1,53 @@
 package model.user;
 
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import java.util.UUID;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import model.AbstractEntity;
+import org.bson.codecs.pojo.annotations.BsonCreator;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 
-@Entity
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(of = "personalId", callSuper = false)
+@EqualsAndHashCode(callSuper = false)
 public class Client extends AbstractEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long personalId;
-
-    @NotBlank
+    @BsonProperty("name")
     private String name;
 
-    @NotBlank
+    @BsonProperty("surname")
     private String surname;
 
-    @Embedded
-    @NotNull
+    @BsonProperty("address")
     private Address address;
 
-    @Enumerated(EnumType.STRING)
+    @BsonProperty(useDiscriminator = true)
     private ClientType clientType;
+
+    @BsonCreator
+    public Client(@BsonProperty("id") UUID id,
+                  @BsonProperty("name") String name,
+                  @BsonProperty("surname") String surname,
+                  @BsonProperty("address") Address address,
+                  @BsonProperty("clientType") ClientType clientType) {
+        super(id);
+        this.name = name;
+        this.surname = surname;
+        this.address = address;
+        this.clientType = clientType;
+    }
+
+    public Client(String name, String surname, Address address, ClientType clientType) {
+        super(UUID.randomUUID());
+        this.name = name;
+        this.surname = surname;
+        this.address = address;
+        this.clientType = clientType;
+    }
 
 }

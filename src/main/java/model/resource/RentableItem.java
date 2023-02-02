@@ -1,45 +1,39 @@
 package model.resource;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.Version;
-import javax.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import java.util.UUID;
+import lombok.Data;
 import model.AbstractEntity;
+import org.bson.codecs.pojo.annotations.BsonCreator;
+import org.bson.codecs.pojo.annotations.BsonDiscriminator;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 
-@Entity
-@Getter
-@Setter
-@SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
-@Inheritance(strategy = InheritanceType.JOINED)
-@EqualsAndHashCode(of = "id", callSuper = false)
+@Data
+@BsonDiscriminator(key = "_clazz")
 public class RentableItem extends AbstractEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    @Column(columnDefinition = "boolean default true")
+    @BsonProperty("isAvailable")
     private boolean isAvailable;
 
-    @Column(unique = true)
+    @BsonProperty("serialNumber")
     private String serialNumber;
 
-    @NotEmpty
+    @BsonProperty("author")
     private String author;
 
-    @NotEmpty
+    @BsonProperty("title")
     private String title;
+
+    @BsonCreator
+    public RentableItem(@BsonProperty("id") UUID id,
+                        @BsonProperty("isAvailable") boolean isAvailable,
+                        @BsonProperty("serialNumber") String serialNumber,
+                        @BsonProperty("author") String author,
+                        @BsonProperty("title") String title) {
+        super(id);
+        this.isAvailable = isAvailable;
+        this.serialNumber = serialNumber;
+        this.author = author;
+        this.title = title;
+    }
 
 }

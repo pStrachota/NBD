@@ -1,5 +1,6 @@
 package model.resource;
 
+import java.util.UUID;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -8,21 +9,23 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.bson.codecs.pojo.annotations.BsonCreator;
+import org.bson.codecs.pojo.annotations.BsonDiscriminator;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 
-@Entity
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-@Getter
-@Setter
+@BsonDiscriminator(key = "_clazz", value = "book")
 public class Book extends RentableItem {
 
-    @NotBlank
+    @BsonProperty("publishing_house")
     private String publishingHouse;
 
-    @Builder
-    public Book(long id, boolean isAvailable, String serialNumber,
-                @NotEmpty String author,
-                @NotEmpty String title, String publishingHouse) {
+    @BsonCreator
+    public Book(@BsonProperty("id") UUID id,
+                @BsonProperty("isAvailable") boolean isAvailable,
+                @BsonProperty("serialNumber") String serialNumber,
+                @BsonProperty("author") String author,
+                @BsonProperty("title") String title,
+                @BsonProperty("publishingHouse") String publishingHouse) {
         super(id, isAvailable, serialNumber, author, title);
         this.publishingHouse = publishingHouse;
     }
