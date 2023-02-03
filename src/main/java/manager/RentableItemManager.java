@@ -4,6 +4,7 @@ import exception.ItemNotFoundException;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import model.resource.Article;
 import model.resource.Book;
 import model.resource.RentableItem;
 import repository.RentableItemRepository;
@@ -20,9 +21,10 @@ public class RentableItemManager {
     }
 
     public RentableItem addArticle(String title, String author, String serialNumber,
-                                String parentOrganisation) {
-        Book book = new Book(UUID.randomUUID(), true, title, author, serialNumber, parentOrganisation);
-        return rentableItemRepository.add(book);
+                                   String parentOrganisation) {
+        Article article = new Article(UUID.randomUUID(), true, title, author, serialNumber,
+                parentOrganisation);
+        return rentableItemRepository.add(article);
     }
 
     public RentableItem findRentableItemById(UUID id) {
