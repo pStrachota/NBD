@@ -1,73 +1,65 @@
 package repository;
 
+import com.mongodb.MongoWriteException;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import model.resource.RentableItem;
+import model.user.Client;
+import org.bson.conversions.Bson;
 
-public class RentableItemRepository extends Repository<RentableItem> implements AutoCloseable {
+public class RentableItemRepository extends MongoRepository implements Repository<RentableItem> {
 
-    EntityManagerFactory entityManagerFactory;
-    EntityManager entityManager;
+    MongoCollection<RentableItem> rentableItemCollection = mongoDatabase.getCollection("rentable_items", RentableItem.class);
 
     public RentableItemRepository() {
-        entityManagerFactory = Persistence.createEntityManagerFactory("default");
-        entityManager = entityManagerFactory.createEntityManager();
+        rentableItemCollection.drop();
+        rentableItemCollection = mongoDatabase.getCollection("rentable_items", RentableItem.class);
     }
 
+    @Override
     public RentableItem add(RentableItem rentableItem) {
         try {
-
-            entityManager.getTransaction().begin();
-            entityManager.persist(rentableItem);
-            entityManager.getTransaction().commit();
+            rentableItemCollection.insertOne(rentableItem);
             return rentableItem;
-        } catch (Exception e) {
+        } catch (MongoWriteException e) {
             return null;
         }
     }
 
+    @Override
+    public void remove(RentableItem rentableItem) {
+        Bson filter = Filters.eq("_id", rentableItem.getUuid());
+        rentableItemCollection.findOneAndDelete(filter);
+    }
+
+    @Override
+    public Optional<RentableItem> findByID(UUID id) {
+        Bson filter = Filters.eq("_id", id);
+        return Optional.ofNullable(rentableItemCollection.find(filter).first());
+    }
+
+    @Override
+    public boolean update(RentableItem rentableItem) {
+        Bson filter = Filters.eq("_id", rentableItem.getUuid());
+        Bson update = Updates.combine(
+                Updates.set("author", rentableItem.getAuthor()),
+                Updates.set("title", rentableItem.getTitle()),
+                Updates.set("serialNumber", rentableItem.getSerialNumber()),
+                Updates.set("isAvailable", rentableItem.isAvailable())
+        );
+        return rentableItemCollection.updateOne(filter, update).wasAcknowledged();
+    }
+
+    @Override
     public List<RentableItem> getItems() {
-        return entityManager.createQuery("from RentableItem", RentableItem.class).getResultList();
-    }
-
-    public boolean remove(RentableItem rentableItem) {
-
-        try {
-            entityManager.getTransaction().begin();
-            entityManager.remove(rentableItem);
-            entityManager.getTransaction().commit();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public Optional<RentableItem> findByID(Long id) {
-        entityManager.getTransaction().begin();
-        RentableItem rentableItem = entityManager.find(RentableItem.class, id);
-        entityManager.getTransaction().commit();
-        return Optional.ofNullable(rentableItem);
-    }
-
-    @Override
-    public RentableItem update(RentableItem rentableItem) {
-
-        try {
-            entityManager.getTransaction().begin();
-            entityManager.merge(rentableItem);
-            entityManager.getTransaction().commit();
-            return rentableItem;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    @Override
-    public void close() {
-        entityManager.close();
-        entityManagerFactory.close();
+        return rentableItemCollection.find().into(new ArrayList<>());
     }
 }

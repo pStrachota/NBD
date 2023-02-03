@@ -2,16 +2,17 @@ package repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-public abstract class Repository<T> {
+public interface Repository<T> {
 
-    public abstract T add(T item);
+    public T add(T item);
 
-    public abstract boolean remove(T item);
+    public void remove(T item);
 
-    public abstract Optional<T> findByID(Long id);
+    public Optional<T> findByID(UUID id);
 
-    public abstract T update(T item);
+    public boolean update(T item);
 
-    public abstract List<T> getItems();
+    public List<T> getItems();
 }

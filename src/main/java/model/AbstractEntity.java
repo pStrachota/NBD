@@ -9,7 +9,7 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 @NoArgsConstructor
 public class AbstractEntity {
 
-    @BsonProperty("id")
+    @BsonProperty("_id")
     private UUID uuid;
 
     public AbstractEntity(UUID uuid) {

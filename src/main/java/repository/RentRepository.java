@@ -1,81 +1,73 @@
 package repository;
 
+import com.mongodb.MongoWriteException;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import java.util.UUID;
 import model.Rent;
 import model.user.Client;
+import org.bson.conversions.Bson;
 
-public class RentRepository extends Repository<Rent> implements AutoCloseable {
+public class RentRepository extends MongoRepository implements Repository<Rent> {
 
-    EntityManagerFactory entityManagerFactory;
-    EntityManager entityManager;
+    MongoCollection<Rent>
+            rentsCollection = mongoDatabase.getCollection("rents", Rent.class);
 
     public RentRepository() {
-        entityManagerFactory = Persistence.createEntityManagerFactory("default");
-        entityManager = entityManagerFactory.createEntityManager();
+        rentsCollection.drop();
+        rentsCollection = mongoDatabase.getCollection("rents", Rent.class);
     }
 
+    @Override
     public Rent add(Rent rent) {
         try {
-            entityManager.getTransaction().begin();
-            entityManager.persist(rent);
-            entityManager.getTransaction().commit();
+            rentsCollection.insertOne(rent);
             return rent;
-        } catch (Exception e) {
+        } catch (MongoWriteException e) {
             return null;
         }
+    }
+
+    @Override
+    public void remove(Rent rent) {
+        Bson filter = Filters.eq("_id", rent.getUuid());
+        rentsCollection.findOneAndDelete(filter);
+    }
+
+    @Override
+    public Optional<Rent> findByID(UUID id) {
+        Bson filter = Filters.eq("_id", id);
+        return Optional.ofNullable(rentsCollection.find(filter).first());
+    }
+
+    @Override
+    public boolean update(Rent rent) {
+
+        Bson filter = Filters.eq("_id", rent.getUuid());
+        Bson update = Updates.combine(
+                Updates.set("is_ended", rent.isEnded()),
+                Updates.set("rent_cost", rent.getRentCost())
+        );
+        return rentsCollection.updateOne(filter, update).wasAcknowledged();
+    }
+
+    public List<Rent> getClientsRents(Client client) {
+        Bson filter = Filters.eq("client._id", client.getUuid());
+        return rentsCollection.find(filter).into(new ArrayList<>());
+    }
+
+    @Override
+    public List<Rent> getItems() {
+        return rentsCollection.find().into(new ArrayList<>());
     }
 
     public int getNumberOfClientRentedItems(Client client) {
-        return entityManager
-                .createQuery("from Rent where client = :client and isEnded = false", Rent.class)
-                .setParameter("client", client)
-                .getResultList()
-                .size();
-    }
-
-    public List<Rent> getItems() {
-        return entityManager.createQuery("from Rent", Rent.class).getResultList();
-    }
-
-    public boolean remove(Rent rent) {
-        try {
-
-            entityManager.getTransaction().begin();
-            entityManager.remove(rent);
-            entityManager.getTransaction().commit();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public Optional<Rent> findByID(Long id) {
-        entityManager.getTransaction().begin();
-        Rent rent = entityManager.find(Rent.class, id);
-        entityManager.getTransaction().commit();
-        return Optional.ofNullable(rent);
-    }
-
-    @Override
-    public Rent update(Rent rent) {
-        try {
-            entityManager.getTransaction().begin();
-            entityManager.merge(rent);
-            entityManager.getTransaction().commit();
-            return rent;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    @Override
-    public void close() {
-        entityManager.close();
-        entityManagerFactory.close();
+        Bson filter = Filters.eq("client._id", client.getUuid());
+        return (int) rentsCollection.countDocuments(filter);
     }
 }
 
