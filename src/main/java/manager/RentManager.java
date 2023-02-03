@@ -7,6 +7,7 @@ import exception.RentableItemNotAvailableException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import model.Rent;
 import model.resource.RentableItem;
@@ -22,7 +23,7 @@ public class RentManager {
     ClientRepository clientRepository;
     RentableItemRepository rentableItemRepository;
 
-    public Rent addRent(long clientId, List<Long> rentableItemIds) {
+    public Rent addRent(UUID clientId, List<UUID> rentableItemIds) {
 
         Client client = clientRepository.findByID(clientId)
                 .orElseThrow(() -> new ItemNotFoundException("Client not found"));
@@ -55,11 +56,11 @@ public class RentManager {
         }
     }
 
-    public boolean removeRent(Rent rent) {
-        return rentRepository.remove(rent);
+    public void removeRent(Rent rent) {
+        rentRepository.remove(rent);
     }
 
-    public Rent endRent(long id) {
+    public boolean endRent(UUID id) {
         Rent rent = rentRepository.findByID(id)
                 .orElseThrow(() -> new ItemNotFoundException("Rent not found"));
 
@@ -88,7 +89,7 @@ public class RentManager {
         return rentRepository.update(rent);
     }
 
-    public Rent findRentById(Long id) {
+    public Rent findRentById(UUID id) {
         return rentRepository.findByID(id)
                 .orElseThrow(() -> new ItemNotFoundException("Rent not found"));
     }

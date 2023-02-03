@@ -2,8 +2,9 @@ package manager;
 
 import exception.ItemNotFoundException;
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
+import model.resource.Book;
 import model.resource.RentableItem;
 import repository.RentableItemRepository;
 
@@ -12,16 +13,29 @@ public class RentableItemManager {
 
     RentableItemRepository rentableItemRepository;
 
-    public RentableItem addRentableItem(RentableItem rentableItem) {
-        return rentableItemRepository.add(rentableItem);
+    public RentableItem addBook(String title, String author, String serialNumber,
+                                String publishingHouse) {
+        Book book = new Book(UUID.randomUUID(), true, title, author, serialNumber, publishingHouse);
+        return rentableItemRepository.add(book);
     }
 
-    public RentableItem findRentableItemById(Long id) {
-        return rentableItemRepository.findByID(id).orElseThrow(() -> new ItemNotFoundException("RentableItem not found"));
+    public RentableItem addArticle(String title, String author, String serialNumber,
+                                String parentOrganisation) {
+        Book book = new Book(UUID.randomUUID(), true, title, author, serialNumber, parentOrganisation);
+        return rentableItemRepository.add(book);
     }
 
-    public RentableItem updateRentableItem(RentableItem rentableItem) {
+    public RentableItem findRentableItemById(UUID id) {
+        return rentableItemRepository.findByID(id)
+                .orElseThrow(() -> new ItemNotFoundException("RentableItem not found"));
+    }
+
+    public boolean updateRentableItem(RentableItem rentableItem) {
         return rentableItemRepository.update(rentableItem);
+    }
+
+    public void removeRentableItem(RentableItem rentableItem) {
+        rentableItemRepository.remove(rentableItem);
     }
 
     public List<RentableItem> findAll() {
