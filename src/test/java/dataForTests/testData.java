@@ -2,12 +2,12 @@ package dataForTests;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import model.user.Address;
+import model.Rent;
 import model.resource.Book;
+import model.resource.RentableItem;
+import model.user.Address;
 import model.user.Client;
 import model.user.ClientType;
-import model.Rent;
-import model.resource.RentableItem;
 
 public class testData {
 
@@ -74,17 +74,17 @@ public class testData {
 
     public static Rent rent = Rent.builder()
             .beginTime(LocalDateTime.now())
-            .rentableItem(Arrays.asList((book)))
+            .rentableItems(Arrays.asList((book)))
             .build();
 
     public static Rent rent2 = Rent.builder()
             .beginTime(LocalDateTime.now())
-            .rentableItem(Arrays.asList((book2)))
+            .rentableItems(Arrays.asList((book2)))
             .build();
 
     public static Rent rent3 = Rent.builder()
             .beginTime(LocalDateTime.now())
-            .rentableItem(Arrays.asList((book3)))
+            .rentableItems(Arrays.asList((book3)))
             .build();
 
 }

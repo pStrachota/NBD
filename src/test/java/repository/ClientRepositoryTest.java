@@ -5,71 +5,43 @@ import static dataForTests.testData.client2;
 import static dataForTests.testData.client3;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import javax.persistence.RollbackException;
+import manager.ClientManager;
 import model.user.Client;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
 class ClientRepositoryTest {
 
-    private static EntityManagerFactory entityManagerFactory =
-            Persistence.createEntityManagerFactory("default");
+    private static final ClientRepository clientRepository = new ClientRepository();
 
-    @AfterAll
-    static void close() {
-        entityManagerFactory.close();
+    @Test
+    void addClientPositiveTest() {
+        Client addedClient = clientRepository.add(client);
+        assertThat(addedClient).isEqualTo(client);
     }
 
     @Test
-    void addClientTest() {
-
-        try (ClientRepository clientRepository = new ClientRepository()) {
-            System.out.println(clientRepository.getItems().size());
-            clientRepository.add(client);
-            assertThat(clientRepository.findByID(client.getPersonalId())).isEqualTo(client);
-        }
+    void addClientNegativeTest() {
+        clientRepository.add(client);
+        assertThat(clientRepository.add(client)).isNull();
     }
 
     @Test
-    void OptimisticLockExceptionTest() {
-
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-        EntityManager entityManager1 = entityManagerFactory.createEntityManager();
-
-        entityManager.getTransaction().begin();
-        entityManager1.getTransaction().begin();
-
-        entityManager.persist(client2);
-        entityManager.getTransaction().commit();
-
-        Client clientEm = entityManager.find(Client.class, client2.getPersonalId());
-        Client clientEm1 = entityManager1.find(Client.class, client2.getPersonalId());
-
-        entityManager.getTransaction().begin();
-        clientEm.setName("newName");
-        entityManager.getTransaction().commit();
-
-        clientEm1.setName("newName1");
-
-        assertThatThrownBy(() -> entityManager1.getTransaction().commit())
-                .isInstanceOf(RollbackException.class);
-
-        entityManager.close();
-        entityManager1.close();
+    void updateClientTest() {
+        clientRepository.add(client2);
+        client2.setName("newName");
+        clientRepository.update(client2);
+        assertThat(clientRepository.findByID(client2.getUuid()).get().getName()).isEqualTo("newName");
     }
 
     @Test
     void removeClientTest() {
-        try (ClientRepository clientRepository = new ClientRepository()) {
-            clientRepository.add(client3);
-            assertThat(clientRepository.getItems()).contains(client3);
-            clientRepository.remove(client3);
-            assertThat(clientRepository.getItems()).doesNotContain(client3);
-
-        }
+        clientRepository.add(client3);
+        clientRepository.remove(client3);
+        assertThat(clientRepository.findByID(client3.getUuid())).isEmpty();
     }
+
 }

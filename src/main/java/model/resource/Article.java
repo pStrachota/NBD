@@ -1,6 +1,7 @@
 package model.resource;
 
 import java.util.UUID;
+import lombok.Builder;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
@@ -11,6 +12,7 @@ public class Article extends RentableItem {
     @BsonProperty("parent_organisation")
     private String parentOrganisation;
 
+    @Builder
     @BsonCreator
     public Article(@BsonProperty("id") UUID id,
                    @BsonProperty("isAvailable") boolean isAvailable,

@@ -1,14 +1,7 @@
 package model.resource;
 
 import java.util.UUID;
-import javax.persistence.Entity;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
@@ -19,6 +12,7 @@ public class Book extends RentableItem {
     @BsonProperty("publishing_house")
     private String publishingHouse;
 
+    @Builder
     @BsonCreator
     public Book(@BsonProperty("id") UUID id,
                 @BsonProperty("isAvailable") boolean isAvailable,

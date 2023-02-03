@@ -3,6 +3,7 @@ package model;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import model.resource.RentableItem;
@@ -12,6 +13,7 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 
 @Data
 @NoArgsConstructor
+@Builder
 public class Rent extends AbstractEntity {
 
     @BsonProperty("begin_time")
