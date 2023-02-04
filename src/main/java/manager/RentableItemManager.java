@@ -1,31 +1,25 @@
 package manager;
 
-import exception.ItemNotFoundException;
-import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import model.resource.RentableItem;
-import repository.RentableItemRepository;
+import repository.impl.RentableItemRepository;
 
 @AllArgsConstructor
 public class RentableItemManager {
 
     RentableItemRepository rentableItemRepository;
 
-    public RentableItem addRentableItem(RentableItem rentableItem) {
-        return rentableItemRepository.add(rentableItem);
+    public void addRentableItem(RentableItem rentableItem) {
+        rentableItemRepository.add(rentableItem);
     }
 
-    public RentableItem findRentableItemById(Long id) {
-        return rentableItemRepository.findByID(id).orElseThrow(() -> new ItemNotFoundException("RentableItem not found"));
+    public Optional<RentableItem> findRentableItemById(UUID id) {
+        return rentableItemRepository.findById(id);
     }
 
-    public RentableItem updateRentableItem(RentableItem rentableItem) {
-        return rentableItemRepository.update(rentableItem);
+    public void updateRentableItem(RentableItem rentableItem) {
+        rentableItemRepository.update(rentableItem);
     }
-
-    public List<RentableItem> findAll() {
-        return rentableItemRepository.getItems();
-    }
-
 }

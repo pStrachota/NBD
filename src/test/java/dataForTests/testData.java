@@ -1,13 +1,12 @@
 package dataForTests;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import model.user.Address;
+import java.time.LocalDate;
+import model.rent.Rent;
 import model.resource.Book;
+import model.resource.RentableItem;
+import model.user.Address;
 import model.user.Client;
 import model.user.ClientType;
-import model.Rent;
-import model.resource.RentableItem;
 
 public class testData {
 
@@ -31,22 +30,22 @@ public class testData {
 
 
     public static Client client = Client.builder()
-            .name("Adam")
-            .surname("Kowalski")
+            .firstName("Adam")
+            .lastName("Kowalski")
             .address(address)
             .clientType(ClientType.STUDENT)
             .build();
 
     public static Client client2 = Client.builder()
-            .name("Andrzej")
-            .surname("Kowalski")
+            .firstName("Andrzej")
+            .lastName("Kowalski")
             .address(address2)
             .clientType(ClientType.OUTSIDER)
             .build();
 
     public static Client client3 = Client.builder()
-            .name("Tomasz")
-            .surname("Kowalski")
+            .firstName("Tomasz")
+            .lastName("Kowalski")
             .address(address3)
             .clientType(ClientType.UNIVERSITY_EMPLOYEE)
             .build();
@@ -73,18 +72,18 @@ public class testData {
             .build();
 
     public static Rent rent = Rent.builder()
-            .beginTime(LocalDateTime.now())
-            .rentableItem(Arrays.asList((book)))
+            .beginTime(LocalDate.now())
+            .rentableItem(book)
             .build();
 
     public static Rent rent2 = Rent.builder()
-            .beginTime(LocalDateTime.now())
-            .rentableItem(Arrays.asList((book2)))
+            .beginTime(LocalDate.now())
+            .rentableItem(book2)
             .build();
 
     public static Rent rent3 = Rent.builder()
-            .beginTime(LocalDateTime.now())
-            .rentableItem(Arrays.asList((book3)))
+            .beginTime(LocalDate.now())
+            .rentableItem(book3)
             .build();
 
 }

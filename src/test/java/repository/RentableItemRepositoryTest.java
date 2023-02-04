@@ -4,70 +4,44 @@ import static dataForTests.testData.book;
 import static dataForTests.testData.book2;
 import static dataForTests.testData.book3;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.RollbackException;
 import model.resource.Book;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
+import repository.impl.RentableItemRepository;
+import repository.impl.RepoProducer;
 
 class RentableItemRepositoryTest {
 
-    private static EntityManagerFactory entityManagerFactory =
-            Persistence.createEntityManagerFactory("default");
+    private RentableItemRepository rentableItemRepository =
+            RepoProducer.getRentableItemRepository();
 
-    @AfterAll
-    static void close() {
-        entityManagerFactory.close();
+    @Test
+    void addRentableItemPositiveTest() {
+        assertThat(rentableItemRepository.add(book)).isEqualTo(true);
+        Book addedBook = (Book) rentableItemRepository.findById(book.getUuid()).get();
+        assertThat(addedBook).isEqualTo(book);
     }
 
     @Test
-    void optimisticLockExceptionTest() {
-
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-        EntityManager entityManager1 = entityManagerFactory.createEntityManager();
-
-        entityManager.getTransaction().begin();
-        entityManager1.getTransaction().begin();
-
-        entityManager.persist(book);
-        entityManager.getTransaction().commit();
-
-        Book bookEm = entityManager.find(Book.class, book.getId());
-        Book bookEm1 = entityManager1.find(Book.class, book.getId());
-
-        entityManager.getTransaction().begin();
-        bookEm.setSerialNumber("new serial number");
-        entityManager.getTransaction().commit();
-
-        bookEm1.setSerialNumber("new serial number1");
-
-        assertThatThrownBy(() -> entityManager1.getTransaction().commit()).isInstanceOf(
-                RollbackException.class);
-
-        entityManager.close();
-        entityManager1.close();
+    void addRentableItemNegativeTest() {
+        rentableItemRepository.add(book);
+        assertThat(rentableItemRepository.add(book)).isNull();
     }
 
     @Test
-    void addRentableItemTest() {
-        try (RentableItemRepository rentableItemRepository = new RentableItemRepository()) {
-            rentableItemRepository.add(book2);
-            assertThat(rentableItemRepository.findByID(1L)).isEqualTo(book2);
-        }
+    void updateRentableItemTest() {
+        rentableItemRepository.add(book2);
+        book2.setTitle("newTitle");
+        rentableItemRepository.update(book2);
+        assertThat(rentableItemRepository.findById(book2.getUuid()).get().getTitle())
+                .isEqualTo("newTitle");
     }
 
     @Test
     void removeRentableItemTest() {
-        try (RentableItemRepository rentableItemRepository = new RentableItemRepository()) {
-            rentableItemRepository.add(book3);
-            assertThat(rentableItemRepository.getItems()).contains(book3);
-            rentableItemRepository.remove(book3);
-            assertThat(rentableItemRepository.getItems()).doesNotContain(book3);
-        }
+        rentableItemRepository.add(book3);
+        rentableItemRepository.remove(book3);
+        assertThat(rentableItemRepository.findById(book3.getUuid())).isNull();
     }
 
 }

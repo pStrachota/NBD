@@ -1,10 +1,10 @@
 package manager;
 
-import exception.ItemNotFoundException;
-import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import model.user.Client;
-import repository.ClientRepository;
+import repository.impl.ClientRepository;
 
 @AllArgsConstructor
 public class ClientManager {
@@ -19,15 +19,11 @@ public class ClientManager {
         clientRepository.remove(client);
     }
 
-    public Client updateClient(Client client) {
-        return clientRepository.update(client);
+    public void updateClient(Client client) {
+        clientRepository.update(client);
     }
 
-    public Client findClientByID(Long id) {
-        return clientRepository.findByID(id)
-                .orElseThrow(() -> new ItemNotFoundException("Client not found"));
-    }
-    public List<Client> findAll() {
-        return clientRepository.getItems();
+    public Optional<Client> findClientByID(UUID id) {
+        return clientRepository.findById(id);
     }
 }

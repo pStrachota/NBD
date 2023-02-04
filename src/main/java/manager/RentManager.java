@@ -4,16 +4,16 @@ import exception.EndedRentException;
 import exception.ItemNotFoundException;
 import exception.MaxItemLimitExceededException;
 import exception.RentableItemNotAvailableException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
-import model.Rent;
+import model.rent.Rent;
 import model.resource.RentableItem;
 import model.user.Client;
-import repository.ClientRepository;
-import repository.RentRepository;
-import repository.RentableItemRepository;
+import repository.impl.ClientRepository;
+import repository.impl.RentRepository;
+import repository.impl.RentableItemRepository;
 
 @AllArgsConstructor
 public class RentManager {
@@ -22,31 +22,26 @@ public class RentManager {
     ClientRepository clientRepository;
     RentableItemRepository rentableItemRepository;
 
-    public Rent addRent(long clientId, List<Long> rentableItemIds) {
+    public boolean addRent(UUID clientId, UUID rentableItemId) {
 
-        Client client = clientRepository.findByID(clientId)
+        Client client = clientRepository.findById(clientId)
                 .orElseThrow(() -> new ItemNotFoundException("Client not found"));
 
-        List<RentableItem> rentableItems = new ArrayList<>();
+        RentableItem rentableItem = rentableItemRepository.findById(rentableItemId).orElseThrow(
+                () -> new ItemNotFoundException("RentableItem not found"));
+        if (!rentableItem.isAvailable()) {
+            throw new RentableItemNotAvailableException("RentableItem is rented");
+        }
+        rentableItem.setAvailable(false);
 
-        rentableItemIds.forEach(rentableItemId -> {
-            RentableItem rentableItem = rentableItemRepository.findByID(rentableItemId)
-                    .orElseThrow(() -> new ItemNotFoundException("RentableItem not found"));
-            if (!rentableItem.isAvailable()) {
-                throw new RentableItemNotAvailableException("RentableItem is rented");
-            }
-            rentableItem.setAvailable(false);
-            rentableItems.add(rentableItem);
-        });
-
-        int clientRents = rentRepository.getNumberOfClientRentedItems(client);
+        int clientRents = rentRepository.findByClientId(clientId).size();
 
         Rent rent = new Rent();
         rent.setClient(client);
         rent.setEnded(false);
-        rent.setRentableItems(rentableItems);
-        rent.setBeginTime(LocalDateTime.now());
-        rent.setEndTime(LocalDateTime.now().plusDays(client.getClientType().getMaxDays()));
+        rent.setRentableItem(rentableItem);
+        rent.setBeginTime(LocalDate.now());
+        rent.setEndTime(LocalDate.now().plusDays(client.getClientType().getMaxDays()));
 
         if (client.getClientType().getMaxItems() > clientRents) {
             return rentRepository.add(rent);
@@ -55,26 +50,24 @@ public class RentManager {
         }
     }
 
-    public boolean removeRent(Rent rent) {
-        return rentRepository.remove(rent);
+    public void removeRent(Rent rent) {
+        rentRepository.remove(rent);
     }
 
-    public Rent endRent(long id) {
-        Rent rent = rentRepository.findByID(id)
-                .orElseThrow(() -> new ItemNotFoundException("Rent not found"));
+    public void endRent(UUID id) {
+        Rent rent = rentRepository.findById(id).orElseThrow(
+                () -> new ItemNotFoundException("Rent not found"));
 
         if (rent.isEnded()) {
             throw new EndedRentException("Rent is already ended");
         }
 
         Client client = rent.getClient();
-        rent.setEndTime(LocalDateTime.now());
+        rent.setEndTime(LocalDate.now());
         rent.setEnded(true);
 
-        rent.getRentableItems().forEach(rentableItem -> {
-            rentableItem.setAvailable(true);
-            rentableItemRepository.update(rentableItem);
-        });
+        rent.getRentableItem().setAvailable(true);
+        rentableItemRepository.update(rent.getRentableItem());
 
         if (rent.getEndTime()
                 .isAfter(rent.getBeginTime().plusDays(client.getClientType().getMaxDays()))) {
@@ -85,15 +78,10 @@ public class RentManager {
             rent.setRentCost(client.getClientType().getPenalty() * daysAfterEndTime);
         }
 
-        return rentRepository.update(rent);
+        rentRepository.update(rent);
     }
 
-    public Rent findRentById(Long id) {
-        return rentRepository.findByID(id)
-                .orElseThrow(() -> new ItemNotFoundException("Rent not found"));
-    }
-
-    public List<Rent> findAll() {
-        return rentRepository.getItems();
+    public Optional<Rent> findRentById(UUID id) {
+        return rentRepository.findById(id);
     }
 }
