@@ -1,45 +1,62 @@
 package model.resource;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.Version;
-import javax.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
+import com.datastax.oss.driver.api.mapper.annotations.CqlName;
+import com.datastax.oss.driver.api.mapper.annotations.Entity;
+import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
+import java.io.Serializable;
+import java.util.UUID;
+import javax.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
-import model.AbstractEntity;
+import lombok.ToString;
 
-@Entity
+
+
+@Entity(defaultKeyspace = "library")
+@CqlName("rentable_items")
+@NoArgsConstructor
 @Getter
 @Setter
-@SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
-@Inheritance(strategy = InheritanceType.JOINED)
-@EqualsAndHashCode(of = "id", callSuper = false)
-public class RentableItem extends AbstractEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@EqualsAndHashCode
+@ToString
+public class RentableItem implements Serializable {
 
-    @Column(columnDefinition = "boolean default true")
-    private boolean isAvailable;
+    @CqlName("rentable_item_uuid")
+    @PartitionKey
+    private UUID uuid;
 
-    @Column(unique = true)
-    private String serialNumber;
+    @CqlName("title")
+    private String title;
 
-    @NotEmpty
+    @Size(min = 1)
+    @CqlName("author")
     private String author;
 
-    @NotEmpty
-    private String title;
+    @Size(min = 9)
+    @CqlName("serial_number")
+    private String serialNumber;
+
+    @CqlName("discriminator")
+    private String discriminator;
+
+    @CqlName("is_available")
+    private boolean isAvailable;
+
+
+    public RentableItem(
+            String title,
+            String author,
+            String serialNumber,
+            String discriminator
+    ) {
+        this.uuid = UUID.randomUUID();
+        this.title = title;
+        this.author = author;
+        this.isAvailable = true;
+        this.serialNumber = serialNumber;
+        this.discriminator = discriminator;
+    }
 
 }

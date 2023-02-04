@@ -1,29 +1,34 @@
 package model.resource;
 
-import javax.persistence.Entity;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
+import com.datastax.oss.driver.api.mapper.annotations.CqlName;
+import com.datastax.oss.driver.api.mapper.annotations.Entity;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
-@Entity
+@Entity(defaultKeyspace = "library")
+@CqlName("rentable_items")
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @Getter
 @Setter
+@EqualsAndHashCode(callSuper = false)
+@ToString
 public class Book extends RentableItem {
 
-    @NotBlank
+    @CqlName("publishing_house")
     private String publishingHouse;
 
     @Builder
-    public Book(long id, boolean isAvailable, String serialNumber,
-                @NotEmpty String author,
-                @NotEmpty String title, String publishingHouse) {
-        super(id, isAvailable, serialNumber, author, title);
+    public Book(
+            String title,
+            String author,
+            String serialNumber,
+            String publishingHouse
+    ) {
+        super(title, author, serialNumber, "Book");
         this.publishingHouse = publishingHouse;
     }
 
