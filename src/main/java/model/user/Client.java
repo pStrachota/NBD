@@ -1,46 +1,53 @@
 package model.user;
 
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+
+import java.io.Serializable;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import model.AbstractEntity;
+import lombok.ToString;
 
-@Entity
+@NoArgsConstructor
 @Getter
 @Setter
-@Builder
-@NoArgsConstructor
+@EqualsAndHashCode
+@ToString
 @AllArgsConstructor
-@EqualsAndHashCode(of = "personalId", callSuper = false)
-public class Client extends AbstractEntity {
+@Builder
+public class Client implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long personalId;
+    private String firstName;
 
-    @NotBlank
-    private String name;
+    private UUID uuid;
 
-    @NotBlank
-    private String surname;
+    private String lastName;
 
-    @Embedded
-    @NotNull
     private Address address;
 
-    @Enumerated(EnumType.STRING)
     private ClientType clientType;
+
+    public Client(String firstName, String lastName, Address address, ClientType clientType) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.address = address;
+        this.clientType = clientType;
+        this.uuid = UUID.randomUUID();
+    }
+
+    public ClientHelper toClientHelper() {
+        return new ClientHelper(
+                uuid,
+                firstName,
+                lastName,
+                clientType.getTypeInfo(),
+                address.getCity(),
+                address.getStreet(),
+                address.getNumber()
+        );
+    }
 
 }
