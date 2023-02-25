@@ -48,7 +48,8 @@
   The project consists of 4 tasks related to non-relational databases and one related to relational databases. 
   The tasks performed allowed for practical familiarization with 
   various types of databases and learning about their advantages 
-  and disadvantages as well as examples of their use. More information below.
+  and disadvantages as well as examples of their use. 
+Tasks are located on subsequent branches. More information below.
   
 
   
